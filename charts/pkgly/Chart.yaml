@@ -3,10 +3,6 @@
 apiVersion: v2
 appVersion: 0.1.0
 dependencies:
-- condition: postgresql.enabled
-  name: postgresql
-  repository: https://charts.bitnami.com/bitnami
-  version: 18.1.8
 description: Pkgly - Universal artifact repository supporting various packages
 home: https://github.com/kshcherban/pkgly
 keywords:
