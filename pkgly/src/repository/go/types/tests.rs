@@ -280,3 +280,28 @@ fn test_go_module_request_sumdb_supported_path() {
     ));
     assert_eq!(request.sumdb_path.as_deref(), Some("supported"));
 }
+
+#[test]
+fn test_go_module_path_case_encoding_decoded() {
+    let path = GoModulePath::new("github.com/!jacubeit!u!g/infra/packages/go-heimdall")
+        .expect("case-encoded module path must decode");
+    assert_eq!(
+        path.as_str(),
+        "github.com/JacubeitUG/infra/packages/go-heimdall"
+    );
+}
+
+#[test]
+fn test_go_module_path_invalid_case_encoding() {
+    for bad in [
+        "github.com/!User/module",
+        "github.com/user!/module",
+        "github.com/!1user/module",
+        "github.com/user!",
+    ] {
+        assert!(
+            GoModulePath::new(bad).is_err(),
+            "path {bad} must be rejected"
+        );
+    }
+}

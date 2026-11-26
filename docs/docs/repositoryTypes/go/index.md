@@ -62,6 +62,8 @@ Use the Pkgly repository URL that includes the storage and repository name:
 export GOPROXY=https://your-pkgly.example.com/repositories/<storage-name>/<repository-name>,https://proxy.golang.org,direct
 ```
 
+Module paths with uppercase letters (e.g. `github.com/JacubeitUG/...`) are supported: the Go client case-encodes them (`!jacubeit!u!g`) and Pkgly decodes them per the [module proxy protocol](https://go.dev/ref/mod#module-path-encoding).
+
 ### Add to Shell Profile
 ```bash
 echo 'export GOPROXY=https://your-pkgly.example.com/repositories/<storage-name>/<repository-name>,https://proxy.golang.org,direct' >> ~/.bashrc

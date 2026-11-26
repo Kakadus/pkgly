@@ -8,11 +8,37 @@ use thiserror::Error;
 pub struct GoModulePath(String);
 
 impl GoModulePath {
-    /// Create a new Go module path, validating it follows Go conventions
+    /// Create a new Go module path, validating it follows Go conventions.
+    /// Accepts the Go module proxy case encoding (`!a` -> `A`) and stores
+    /// the decoded path.
     pub fn new(path: impl Into<String>) -> Result<Self, GoModuleError> {
-        let path = path.into();
+        let path = Self::decode_case_encoding(&path.into())?;
         Self::validate(&path)?;
         Ok(GoModulePath(path))
+    }
+
+    /// Decode the Go module proxy case encoding: each `!` followed by a
+    /// lowercase letter becomes that letter uppercased.
+    /// See <https://go.dev/ref/mod#module-path-encoding>.
+    fn decode_case_encoding(path: &str) -> Result<String, GoModuleError> {
+        if !path.contains('!') {
+            return Ok(path.to_string());
+        }
+        let mut decoded = String::with_capacity(path.len());
+        let mut chars = path.chars();
+        while let Some(c) = chars.next() {
+            if c != '!' {
+                decoded.push(c);
+                continue;
+            }
+            match chars.next() {
+                Some(lower) if lower.is_ascii_lowercase() => {
+                    decoded.push(lower.to_ascii_uppercase());
+                }
+                _ => return Err(GoModuleError::InvalidCharacters(path.to_string())),
+            }
+        }
+        Ok(decoded)
     }
 
     /// Get the module path as a string
